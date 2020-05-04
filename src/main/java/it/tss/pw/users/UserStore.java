@@ -33,15 +33,20 @@ public class UserStore {
     }
 
     public User create(User u) {
-        return users.putIfAbsent(u.getId(), u);
+        System.out.println("Create user " + u);
+        users.putIfAbsent(u.getId(), u);
+        return users.get(u.getId());
+        
     }
     
     public User update(User u) {
+        System.out.println("Update user " + u);
         return users.put(u.getId(), u);
     }
     
-    public User delete(User u) {
-        return users.remove(u);
+    public void delete(User u) {
+        System.out.println("Delete user " + u);
+        users.remove(u);
     }
     
 }
