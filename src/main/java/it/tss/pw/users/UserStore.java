@@ -31,6 +31,10 @@ public class UserStore {
     public Collection<User> all() {
         return users.values();
     }
+    
+    public User find(Long id){
+        return users.get(id);
+    }
 
     public User create(User u) {
         System.out.println("Create user " + u);
@@ -44,9 +48,9 @@ public class UserStore {
         return users.put(u.getId(), u);
     }
     
-    public void delete(User u) {
-        System.out.println("Delete user " + u);
-        users.remove(u);
+    public void delete(Long id) {
+        System.out.println("Delete user " + id);
+        users.remove(id);
     }
     
 }
