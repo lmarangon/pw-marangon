@@ -20,12 +20,13 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 /**
  *
  * @author luca
  */
-@Path("users")
+@Path("/users")
 public class UsersResource {
 
     @Inject
@@ -33,8 +34,8 @@ public class UsersResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<User> all(@QueryParam("search")String search) {
-       return search== null ? store.all() : store.search(search);
+    public Collection<User> all(@QueryParam("search") String search) {
+        return search == null ? store.all() : store.search(search);
     }
 
     @GET
@@ -47,15 +48,25 @@ public class UsersResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public User create(User u) {
+    public Response create(User u) {
+        if(u.getId() == null){
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .header("projectwork-error-descr", "id mancante")
+                    .build();
+        }
+        
         User saved = store.create(u);
-        return saved;
+        return Response
+                .status(Response.Status.CREATED)
+                .entity(saved)
+                .build();
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public User create(
+    public Response create(
             @FormParam("firstName") String fname,
             @FormParam("lastName") String lname,
             @FormParam("usr") String usr,
@@ -64,7 +75,10 @@ public class UsersResource {
         user.setFirstName(fname);
         user.setLastName(lname);
         User saved = store.create(user);
-        return saved;
+        return Response
+                .status(Response.Status.CREATED)
+                .entity(saved)
+                .build();
     }
 
     @PUT
@@ -77,11 +91,11 @@ public class UsersResource {
         }
         return store.update(u);
     }
-    
+
     @PATCH
     @Path("{id}/firstname")
     @Produces(MediaType.APPLICATION_JSON)
-    public User updateFirstName(@PathParam("id") Long id, JsonObject json){
+    public User updateFirstName(@PathParam("id") Long id, JsonObject json) {
         User found = store.find(id);
         found.setFirstName(json.getString("firstName"));
         return store.update(found);
@@ -89,7 +103,8 @@ public class UsersResource {
 
     @DELETE
     @Path("{id}")
-    public void delete(@PathParam("id") Long id) {
+    public Response delete(@PathParam("id") Long id) {
         store.delete(id);
+        return Response.status(Response.Status.NO_CONTENT).build();
     }
 }

@@ -7,7 +7,9 @@ package it.tss.pw.users;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import javax.json.bind.annotation.JsonbDateFormat;
 
 /**
  *
@@ -20,6 +22,7 @@ public class User implements Serializable {
     private String lastName;   
     private String usr;    
     private String pwd;   
+    @JsonbDateFormat("dd/MM/yyyy")
     private LocalDate birthDate;
 
     public User() {
@@ -108,10 +111,12 @@ public class User implements Serializable {
 
     @Override
     public String toString() {
-        return "User{" + "id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", usr=" + usr + ", pwd=" + pwd + ", birthDate=" + birthDate + '}';
+        return "User{" + "id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", usr=" + usr + ", pwd=" + pwd + ", birthDate=" + 
+                birthDate == null ? "": birthDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + '}';
+    }
     }
     
     
     
     
-}
+
