@@ -5,9 +5,12 @@
  */
 package it.tss.pw.users;
 
+
+import it.tss.pw.security.Credential;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
@@ -15,7 +18,7 @@ import javax.enterprise.context.ApplicationScoped;
 
 /**
  *
- * @author luca
+ * @author alfonso
  */
 @ApplicationScoped
 public class UserStore {
@@ -24,7 +27,7 @@ public class UserStore {
 
     @PostConstruct
     public void init() {
-        Stream.of(new User(1l, "marangon", "marangonpwd"), new User(2l, "scavarda", "scavardapwd"), new User(3l, "zinutti", "zinuttipwd"))
+        Stream.of(new User(1l, "rossi", "rossipwd"), new User(2l, "verdi", "verdipwd"), new User(3l, "bianchi", "bianchipwd"))
                 .forEach(v -> users.put(v.getId(), v));
     }
 
@@ -33,6 +36,9 @@ public class UserStore {
     }
 
     public User find(Long id) {
+        if (id == null || id == 0) {
+            throw new IllegalArgumentException("id non valido");
+        }
         return users.get(id);
     }
 
@@ -55,12 +61,18 @@ public class UserStore {
 
     public Collection<User> search(String search) {
         return users.values().stream()
-                .filter(v -> this.search(v,search)).collect(Collectors.toList());
+                .filter(v -> this.search(v, search)).collect(Collectors.toList());
     }
-    
-    private boolean search(User u, String search){
-        return  (u.getFirstName()!= null && u.getFirstName().contains(search))
-                || (u.getLastName()!= null && u.getLastName().contains(search)) 
-                || (u.getUsr()!= null && u.getUsr().contains(search));
+
+    private boolean search(User u, String search) {
+        return (u.getFirstName() != null && u.getFirstName().contains(search))
+                || (u.getLastName() != null && u.getLastName().contains(search))
+                || (u.getUsr() != null && u.getUsr().contains(search));
+    }
+
+    public Optional<User> search(Credential credential) {
+        return users.values().stream()
+                .filter(v -> v.getUsr().equals(credential.getUsr()) && v.getPwd().equals(credential.getPwd()))
+                .findFirst();
     }
 }

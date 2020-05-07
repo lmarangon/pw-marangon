@@ -8,10 +8,12 @@ package it.tss.pw.users;
 import java.util.Collection;
 import javax.inject.Inject;
 import javax.json.JsonObject;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -19,12 +21,13 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
  *
- * @author luca
+ * @author alfonso
  */
 @Path("/users")
 public class UsersResource {
@@ -42,21 +45,25 @@ public class UsersResource {
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public User find(@PathParam("id") Long id) {
-        return store.find(id);
+        User found = store.find(id);
+        if (found == null) {
+            throw new NotFoundException();
+        }
+        return found;
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response create(User u) {
-        if(u.getId() == null){
+        if (u.getId() == null) {
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .header("projectwork-error-descr", "id mancante")
+                    .header("caused-by", "id mancante")
                     .build();
         }
-        
-        User saved = store.create(u);
+
+        User saved = store.create(u);      
         return Response
                 .status(Response.Status.CREATED)
                 .entity(saved)
@@ -67,11 +74,17 @@ public class UsersResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response create(
+            @FormParam("id") Long id,
             @FormParam("firstName") String fname,
             @FormParam("lastName") String lname,
             @FormParam("usr") String usr,
             @FormParam("pwd") String pwd) {
-        User user = new User(null, usr, pwd);
+
+        if (id == null) {
+            throw new BadRequestException();
+        }
+
+        User user = new User(id, usr, pwd);
         user.setFirstName(fname);
         user.setLastName(lname);
         User saved = store.create(user);
@@ -104,6 +117,10 @@ public class UsersResource {
     @DELETE
     @Path("{id}")
     public Response delete(@PathParam("id") Long id) {
+        User found = store.find(id);
+        if (found == null) {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
         store.delete(id);
         return Response.status(Response.Status.NO_CONTENT).build();
     }

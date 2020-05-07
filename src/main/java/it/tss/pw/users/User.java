@@ -13,15 +13,15 @@ import javax.json.bind.annotation.JsonbDateFormat;
 
 /**
  *
- * @author luca
+ * @author alfonso
  */
 public class User implements Serializable {
-    
+
     private Long id;
-    private String firstName;    
-    private String lastName;   
-    private String usr;    
-    private String pwd;   
+    private String firstName;
+    private String lastName;
+    private String usr;
+    private String pwd;
     @JsonbDateFormat("dd/MM/yyyy")
     private LocalDate birthDate;
 
@@ -33,9 +33,8 @@ public class User implements Serializable {
         this.usr = usr;
         this.pwd = pwd;
     }
-    
-    
 
+    
     public Long getId() {
         return id;
     }
@@ -86,8 +85,8 @@ public class User implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 67 * hash + Objects.hashCode(this.id);
+        int hash = 5;
+        hash = 71 * hash + Objects.hashCode(this.id);
         return hash;
     }
 
@@ -103,10 +102,7 @@ public class User implements Serializable {
             return false;
         }
         final User other = (User) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.id, other.id);
     }
 
     @Override
@@ -114,9 +110,5 @@ public class User implements Serializable {
         return "User{" + "id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", usr=" + usr + ", pwd=" + pwd + ", birthDate=" + 
                 birthDate == null ? "": birthDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + '}';
     }
-    }
-    
-    
-    
-    
 
+}
