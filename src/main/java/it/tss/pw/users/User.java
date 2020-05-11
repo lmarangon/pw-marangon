@@ -12,8 +12,8 @@ import java.util.Objects;
 import javax.json.bind.annotation.JsonbDateFormat;
 
 /**
- *
- * @author alfonso
+ *prova di commit
+ * @author luca
  */
 public class User implements Serializable {
 
